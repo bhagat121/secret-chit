@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import SecretCard from "./SecretCard";
 import SecretForm from "./SecretForm";
 import Modal from "@/components/ui/Modal";
+import SecretViewModal from "@/components/SecretViewModal";
 
 type Secret = {
   id: string;
@@ -19,12 +20,12 @@ type Secret = {
 export default function Dashboard() {
   const { data: session } = useSession();
   const { data, isLoading, refetch } = trpc.dashboard.getMySecrets.useQuery();
-  // const createSecret = trpc.secret.createSecret.useMutation();
   const updateSecret = trpc.secret.updateSecret.useMutation();
   const deleteMutation = trpc.dashboard.deleteSecret.useMutation();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [editingSecret, setEditingSecret] = useState<Secret | null>(null);
+  const [selectedSecretId, setSelectedSecretId] = useState<string | null>(null);
 
   const [editContent, setEditContent] = useState("");
   const [editOneTime, setEditOneTime] = useState(false);
@@ -101,6 +102,7 @@ export default function Dashboard() {
                 setEditOneTime(secret.oneTimeAccess);
                 setEditExpiresIn("24h");
               }}
+              onView={() => setSelectedSecretId(secret.id)}
             />
           ))}
         </div>
@@ -150,6 +152,14 @@ export default function Dashboard() {
           Save Changes
         </button>
       </Modal>
+
+      <SecretViewModal
+        id={selectedSecretId}
+        onClose={() => {
+          setSelectedSecretId(null);
+          refetch(); // <-- refetch secrets so status gets updated
+        }}
+      />
     </div>
   );
 }

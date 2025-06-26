@@ -11,10 +11,16 @@ type Props = {
   };
   onDelete: () => void;
   onEdit: () => void;
+  onView: () => void;
 };
 
-export default function SecretCard({ secret, onDelete, onEdit }: Props) {
-  const secretUrl = `${window.location.origin}/secret?id=${secret.id}`;
+export default function SecretCard({
+  secret,
+  onDelete,
+  onEdit,
+  onView,
+}: Props) {
+  // const secretUrl = `${window.location.origin}/secret?id=${secret.id}`;
   const now = new Date();
   const expiresAt = new Date(secret.expiresAt);
 
@@ -56,14 +62,20 @@ export default function SecretCard({ secret, onDelete, onEdit }: Props) {
         </div>
 
         {status === "Active" && (
-          <a
-            href={secretUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block text-blue-600 hover:underline text-sm mt-1"
+          // <a
+          //   href={secretUrl}
+          //   target="_blank"
+          //   rel="noopener noreferrer"
+          //   className="inline-block text-blue-600 hover:underline text-sm mt-1"
+          // >
+          //   🔗 View Secret
+          // </a>
+          <button
+            onClick={onView}
+            className="text-blue-600 hover:underline text-sm mr-4"
           >
             🔗 View Secret
-          </a>
+          </button>
         )}
       </div>
 
