@@ -7,17 +7,25 @@ import SecretCard from "./SecretCard";
 import SecretForm from "./SecretForm";
 import Modal from "@/components/ui/Modal";
 
+type Secret = {
+  id: string;
+  content: string;
+  expiresAt: Date;
+  viewedAt: Date | null;
+  oneTimeAccess: boolean;
+  isDeleted: boolean;
+};
+
 export default function Dashboard() {
   const { data: session } = useSession();
   const { data, isLoading, refetch } = trpc.dashboard.getMySecrets.useQuery();
-  const createSecret = trpc.secret.createSecret.useMutation();
+  // const createSecret = trpc.secret.createSecret.useMutation();
   const updateSecret = trpc.secret.updateSecret.useMutation();
   const deleteMutation = trpc.dashboard.deleteSecret.useMutation();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingSecret, setEditingSecret] = useState<(typeof data)[0] | null>(
-    null
-  );
+  const [editingSecret, setEditingSecret] = useState<Secret | null>(null);
+
   const [editContent, setEditContent] = useState("");
   const [editOneTime, setEditOneTime] = useState(false);
   const [editExpiresIn, setEditExpiresIn] = useState("24h");
@@ -30,9 +38,10 @@ export default function Dashboard() {
       </div>
     );
 
-  const filteredSecrets = data.filter((secret) =>
-    secret.content.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredSecrets =
+    data?.filter((secret) =>
+      secret.content.toLowerCase().includes(searchTerm.toLowerCase())
+    ) ?? [];
 
   const handleUpdate = async () => {
     if (!editingSecret || !editContent.trim()) return;

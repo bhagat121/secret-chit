@@ -1,24 +1,25 @@
 // server/auth.ts
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { prisma } from './db';
-import bcrypt from 'bcrypt';
-import type { NextAuthOptions } from 'next-auth';
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { prisma } from "./db";
+import bcrypt from "bcrypt";
+import type { NextAuthOptions } from "next-auth";
+import { getServerSession } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: 'jwt',
+    strategy: "jwt",
   },
   pages: {
-    signIn: '/login',
+    signIn: "/login",
   },
   providers: [
     CredentialsProvider({
-      name: 'Credentials',
+      name: "Credentials",
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         const user = await prisma.user.findUnique({
@@ -52,10 +53,14 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session?.user) {
-        session.user.id = token.sub;
-        session.user.name = token.name as string ?? null; // Attach name to session
+        session.user.id = token.sub!;
+        session.user.name = (token.name as string) ?? null; // Attach name to session
       }
       return session;
     },
   },
+};
+
+export const getServerAuthSession = async () => {
+  return await getServerSession(authOptions);
 };

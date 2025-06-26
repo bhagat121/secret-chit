@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function SecretCard({ secret, onDelete, onEdit }: Props) {
-  const secretUrl = `${window.location.origin}/secret/${secret.id}`;
+  const secretUrl = `${window.location.origin}/secret?id=${secret.id}`;
   const now = new Date();
   const expiresAt = new Date(secret.expiresAt);
 

@@ -1,12 +1,10 @@
-import { getServerAuthSession } from '@/server/auth'; // your next-auth config
-import { initTRPC, TRPCError } from '@trpc/server';
-import superjson from 'superjson';
-import type { Session } from 'next-auth';
-import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
+import { getServerAuthSession } from "@/server/auth";
+import { initTRPC, TRPCError } from "@trpc/server";
+import superjson from "superjson";
 
 // Step 1: Context function to inject session into tRPC ctx
-export const createContext = async ({ req, res }: CreateNextContextOptions) => {
-  const session = await getServerAuthSession({ req, res });
+export const createContext = async () => {
+  const session = await getServerAuthSession();
   return { session };
 };
 
@@ -24,7 +22,7 @@ export const publicProcedure = t.procedure;
 // Protected = requires session
 const isAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session?.user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
     ctx: {
